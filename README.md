@@ -16,14 +16,9 @@ Project Status: In Progress
 - Git
 
 ## Current Features
-- Authentication & Users
-- User registration
-- User login and logout
-- JWT authentication
+- User registration and authentication (JWT)
+- User account management (profile update, password change, account deletion)
 - Password hashing
-- Update user profile
-- Change password
-- Delete user account
 
 ## Planned Features
 
