@@ -20,7 +20,8 @@ from app.schemas.message_schema import MessageSchema
 
 user_bp = Blueprint(
     "user",
-    __name__
+    __name__,
+    url_prefix="/user"
 )
 
 
@@ -43,7 +44,7 @@ def get_user():
     return user
 
 
-@user_bp.route("/update_user", methods=["PATCH"])
+@user_bp.route("/update", methods=["PATCH"])
 @user_bp.doc(
     summary="Оновлення користувача",
     description="""
@@ -60,7 +61,9 @@ def get_user():
 def update_user(data):
     user_id = get_jwt_identity()
     db = get_db()
-    user = db.get(User, user_id)
+    user = db.query(User).filter_by(
+        id=user_id
+    ).first()
 
     if not user:
         return {"message": "Користувача не знайдено"}, 404
@@ -82,7 +85,7 @@ def update_user(data):
     return user
 
 
-@user_bp.route("/delete_user", methods=["DELETE"])
+@user_bp.route("/delete", methods=["DELETE"])
 @user_bp.doc(
     summary="Видалення акаунту користувача",
     description="""
@@ -109,7 +112,7 @@ def delete_user():
     return "", 204
 
 
-@user_bp.route("/change_password", methods=["POST"])
+@user_bp.route("/change-password", methods=["POST"])
 @user_bp.doc(
     summary="Зміна пароля",
     description="""

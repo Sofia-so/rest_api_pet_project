@@ -6,9 +6,6 @@ from marshmallow import (
     ValidationError
 )
 
-class MessageSchema(Schema):
-    message = fields.Str(required=True)
-
 
 class UserBaseSchema(Schema):
     first_name = fields.Str(

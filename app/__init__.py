@@ -9,10 +9,14 @@ from app.router import (
     home
 )
 import os
+from dotenv import load_dotenv
 
 
 def create_app():
     app = Flask(__name__)
+
+    load_dotenv()
+
     app.config.update(
         API_TITLE="API",
         API_VERSION="v1",
@@ -44,9 +48,13 @@ def create_app():
 
     from app.router.home import home_bp
     from app.router.user import user_bp
+    from app.router.admin import worker_bp
+    from app.router.category import category_bp
 
     api.register_blueprint(home_bp)
     api.register_blueprint(user_bp)
+    api.register_blueprint(worker_bp)
+    api.register_blueprint(category_bp)
     app.teardown_appcontext(close_db)
 
     return app

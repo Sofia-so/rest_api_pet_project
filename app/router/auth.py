@@ -45,7 +45,8 @@ def register(data):
             last_name=data["last_name"],
             username=data["username"],
             email=data["email"],
-            password=generate_password_hash(data["password"])
+            password=generate_password_hash(data["password"]),
+            role="client"
         )
         db.add(new_user)
         db.commit()

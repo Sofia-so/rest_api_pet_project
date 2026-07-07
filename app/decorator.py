@@ -1,0 +1,33 @@
+from functools import wraps
+from flask_jwt_extended import (
+    verify_jwt_in_request,
+    get_jwt_identity
+)
+
+from app.db.session import get_db
+from app.db.model import User
+
+
+def role_required(role):
+    def decorator(fn):
+        @wraps(fn)
+        def wrapper(*args, **kwargs):
+            verify_jwt_in_request()
+
+            db = get_db()
+
+            user = db.query(User).filter_by(
+                id=get_jwt_identity()
+            ).first()
+
+            if user is None:
+                return {"message": "User not found"}, 404
+
+            if user.role != role:
+                return {"message": "Access denied"}, 403
+
+            return fn(*args, **kwargs)
+
+        return wrapper
+
+    return decorator

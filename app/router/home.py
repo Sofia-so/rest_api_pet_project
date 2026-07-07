@@ -10,7 +10,7 @@ home_bp = Blueprint(
 )
 
 
-@home_bp.route("/home_page")
+@home_bp.route("/home")
 @home_bp.doc(
     summary="вітає користувача на головній сторінці",
     description="головна сторінка",
