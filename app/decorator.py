@@ -8,7 +8,7 @@ from app.db.session import get_db
 from app.db.model import User
 
 
-def role_required(role):
+def role_required(*roles):
     def decorator(fn):
         @wraps(fn)
         def wrapper(*args, **kwargs):
@@ -23,7 +23,7 @@ def role_required(role):
             if user is None:
                 return {"message": "User not found"}, 404
 
-            if user.role != role:
+            if user.role not in roles:
                 return {"message": "Access denied"}, 403
 
             return fn(*args, **kwargs)

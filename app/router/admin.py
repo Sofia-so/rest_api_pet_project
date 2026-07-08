@@ -46,9 +46,16 @@ def register_employee(data):
         )
         db.add(new_worker)
         db.commit()
+
     except IntegrityError:
         db.rollback()
         return {"message": "Користувач з таким ім'ям або email вже існує."}, 400
+
+    except Exception:
+        return {"message": "Не вдалося виконати запит."}, 500
+
+    return new_worker
+
 
 
 @worker_bp.route("/", methods=["GET"])

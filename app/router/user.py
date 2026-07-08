@@ -32,6 +32,10 @@ user_bp = Blueprint(
     tags=["Users"]
 )
 @user_bp.response(200, UserResponseSchema)
+@user_bp.alt_response(
+    404,
+    description="Користувача не знайдено"
+)
 @jwt_required()
 def get_user():
     user_id = get_jwt_identity()
@@ -44,7 +48,7 @@ def get_user():
     return user
 
 
-@user_bp.route("/update", methods=["PATCH"])
+@user_bp.route("/me", methods=["PATCH"])
 @user_bp.doc(
     summary="Оновлення користувача",
     description="""
@@ -57,6 +61,14 @@ def get_user():
 )
 @user_bp.arguments(UserUpdateSchema)
 @user_bp.response(200, UserResponseSchema)
+@user_bp.alt_response(
+    404,
+    description="Користувача не знайдено"
+)
+@user_bp.alt_response(
+    409,
+    description="Користувач з таким ім'ям або email вже існує."
+)
 @jwt_required()
 def update_user(data):
     user_id = get_jwt_identity()
@@ -65,14 +77,12 @@ def update_user(data):
         id=user_id
     ).first()
 
-    if not user:
+    if user is None:
         return {"message": "Користувача не знайдено"}, 404
 
     try:
-        user.first_name = data.get("first_name", user.first_name)
-        user.last_name = data.get("last_name", user.last_name)
-        user.username = data.get("username", user.username)
-        user.email = data.get("email", user.email)
+        for key, value in data.items():
+            setattr(user, key, value)
 
         db.commit()
         db.refresh(user)
@@ -81,11 +91,11 @@ def update_user(data):
         db.rollback()
         return {
             "message": "Користувач з таким ім'ям або email вже існує."
-        }, 400
+        }, 409
     return user
 
 
-@user_bp.route("/delete", methods=["DELETE"])
+@user_bp.route("/me", methods=["DELETE"])
 @user_bp.doc(
     summary="Видалення акаунту користувача",
     description="""
@@ -94,6 +104,14 @@ def update_user(data):
     tags=["Users"]
 )
 @user_bp.response(204)
+@user_bp.alt_response(
+    404,
+    description="Користувача не знайдено"
+)
+@user_bp.alt_response(
+    500,
+    description="Не вдалося виконати запит."
+)
 @jwt_required()
 def delete_user():
     user_id = get_jwt_identity()
@@ -112,7 +130,7 @@ def delete_user():
     return "", 204
 
 
-@user_bp.route("/change-password", methods=["POST"])
+@user_bp.route("/me/password", methods=["PATCH"])
 @user_bp.doc(
     summary="Зміна пароля",
     description="""
@@ -126,6 +144,18 @@ def delete_user():
 )
 @user_bp.arguments(ChangePasswordSchema)
 @user_bp.response(200, MessageSchema)
+@user_bp.alt_response(
+    404,
+    description="Користувача не знайдено"
+)
+@user_bp.alt_response(
+    500,
+    description="Не вдалося змінити пароль."
+)
+@user_bp.alt_response(
+    401,
+    description="Поточний пароль невірний."
+)
 @jwt_required()
 def change_password(data):
     db = get_db()

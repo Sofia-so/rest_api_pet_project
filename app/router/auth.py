@@ -36,6 +36,10 @@ from app.authen.jwt_blocklist import BLACKLIST
 )
 @user_bp.arguments(UserBaseSchema)
 @user_bp.response(201, UserResponseSchema)
+@user_bp.alt_response(
+    409,
+    description="Користувач з таким ім'ям або email вже існує."
+)
 def register(data):
     db = get_db()
 
@@ -55,7 +59,7 @@ def register(data):
         db.rollback()
         return {
             "message": "Користувач з таким ім'ям або email вже існує."
-        }, 400
+        }, 409
     return new_user, 201
 
 
@@ -72,6 +76,10 @@ def register(data):
 )
 @user_bp.arguments(UserLoginSchema)
 @user_bp.response(200, TokenSchema)
+@user_bp.alt_response(
+    401,
+    description="Невірний логін або пароль"
+)
 def login(data):
     db = get_db()
     user = (

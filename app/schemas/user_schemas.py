@@ -38,23 +38,16 @@ class UserBaseSchema(Schema):
 
 
 class UserUpdateSchema(Schema):
-    first_name = fields.Str(
-        required=False,
-        validate=validate.Length(max=50)
-    )
-    last_name = fields.Str(
-        required=False,
-        validate=validate.Length(max=50)
-    )
-    username = fields.Str(
-        required=False,
-        validate=validate.Length(min=3, max=50)
-    )
-    email = fields.Email(required=False)
+    first_name = fields.Str(validate=validate.Length(max=50))
+    last_name = fields.Str(validate=validate.Length(max=50))
+    username = fields.Str(validate=validate.Length(min=3, max=50))
+    email = fields.Email()
 
 
 class UserResponseSchema(Schema):
     id = fields.Int(dump_only=True)
+    username = fields.Str()
+    email = fields.Email()
 
 
 class UserLoginSchema(Schema):

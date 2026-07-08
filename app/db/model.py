@@ -68,9 +68,14 @@ class Product(Base):
         nullable=False
     )
     status: Mapped[ProductStatus] = mapped_column(
-        Enum(ProductStatus),
+        Enum(
+            ProductStatus,
+            values_callable=lambda enum: [
+            item.value for item in enum
+        ]),
         nullable=False
     )
+    quantity: Mapped[int] = mapped_column(nullable=False)
     category_id: Mapped[int] = mapped_column(ForeignKey("categories.id"))
     category: Mapped["Category"] = relationship(back_populates="products")
 

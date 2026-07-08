@@ -1,11 +1,11 @@
 from flask_smorest import Blueprint
 from sqlalchemy.exc import IntegrityError
-from flask_jwt_extended import jwt_required
 
 from app.decorator import role_required
 from app.schemas.category_schema import(
     CategoryBaseSchema,
-    CategoryResponseSchema
+    CategoryResponseSchema,
+    CategoryUpdateSchema
 )
 from app.db.session import get_db
 from app.db.model import Category
@@ -13,7 +13,7 @@ from app.db.model import Category
 category_bp = Blueprint(
     "categories",
     __name__,
-    "/category"
+    url_prefix="/category"
 )
 
 
@@ -29,6 +29,14 @@ category_bp = Blueprint(
 )
 @category_bp.arguments(CategoryBaseSchema)
 @category_bp.response(201, CategoryResponseSchema)
+@category_bp.alt_response(
+    409,
+    description="Категорія з такою назвою вже існує."
+)
+@category_bp.alt_response(
+    500,
+    description="Виникла помилка сервера"
+)
 @role_required("admin")
 def create_category(data):
     db = get_db()
@@ -42,11 +50,11 @@ def create_category(data):
         db.refresh(category)
     except IntegrityError:
         db.rollback()
-        return {"message": "Категорія з такою назвою вже існує."}, 400
+        return {"message": "Категорія з такою назвою вже існує."}, 409
 
     except Exception:
         db.rollback()
-        return {"message": "Виникла помилка"}, 500
+        return {"message": "Виникла помилка сервера"}, 500
 
     return category, 201
 
@@ -75,8 +83,20 @@ def get_categories():
     """,
     tags=["Categories"]
 )
-@category_bp.arguments(CategoryBaseSchema)
+@category_bp.arguments(CategoryUpdateSchema)
 @category_bp.response(200, CategoryResponseSchema)
+@category_bp.alt_response(
+    409,
+    description="Категорія з такою назвою вже існує."
+)
+@category_bp.alt_response(
+    500,
+    description="Виникла помилка сервера"
+)
+@category_bp.alt_response(
+    404,
+    description="Категорію не знайдено"
+)
 @role_required("admin")
 def update_category(data, category_id):
     db = get_db()
@@ -88,8 +108,8 @@ def update_category(data, category_id):
         return {"message": "Категорію не знайдено"}, 404
 
     try:
-        category.name = data["name"]
-        category.description = data["description"]
+        for key, value in data.items():
+            setattr(category, key, value)
         db.commit()
         db.refresh(category)
 
@@ -99,7 +119,7 @@ def update_category(data, category_id):
 
     except Exception:
         db.rollback()
-        return {"message": "Виникла помилка"}, 500
+        return {"message": "Виникла помилка сервера"}, 500
 
     return category
 
@@ -115,6 +135,18 @@ def update_category(data, category_id):
     tags=["Categories"]
 )
 @category_bp.response(204)
+@category_bp.alt_response(
+    500,
+    description="Виникла помилка сервера"
+)
+@category_bp.alt_response(
+    404,
+    description="Категорію не знайдено"
+)
+@category_bp.alt_response(
+    400,
+    description="Неможливо видалити категорію, оскільки вона містить товари."
+)
 @role_required("admin")
 def delete_category(category_id):
     db = get_db()
