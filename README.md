@@ -1,5 +1,6 @@
 # Online Store REST API
 
+A RESTful API for an online store built with Flask.
 The project allows users to register, authenticate, manage their accounts, browse products, and place orders.
 
 Project Status: In Progress
@@ -16,16 +17,18 @@ Project Status: In Progress
 - Git
 
 ## Current Features
-- User registration and authentication (JWT)
-- User account management (profile update, password change, account deletion)
-- Password hashing
+
+- User registration and JWT authentication
+- Role-based access control (Admin, Employee, User)
+- User profile management
+- Category CRUD operations
+- Product CRUD operations
+- Product categorization and inventory management
+- Request and response validation with Marshmallow
+- Interactive Swagger/OpenAPI documentation
+- Database migrations with Alembic
 
 ## Planned Features
-
-### Products
-
-- Product management (CRUD)
-- Product catalog
 
 ### Orders
 
@@ -36,7 +39,7 @@ Project Status: In Progress
 
 ---
 
-##  Author
+## Author
 
 **Sofia Sudarkova**
 
