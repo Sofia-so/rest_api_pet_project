@@ -1,5 +1,6 @@
 from flask_smorest import Blueprint
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import select
 
 from app.decorator import role_required
 from app.db.session import get_db
@@ -9,6 +10,7 @@ from app.schemas.product_schemas import (
     ProductUpdateSchema
 )
 from app.db.model import Product, Category
+from app.schemas.search_schemas import SearchSchema
 
 product_bp = Blueprint(
     "products",
@@ -76,6 +78,23 @@ def create_product(data):
 def get_products():
     db = get_db()
     products = db.query(Product).all()
+    return products
+
+
+@product_bp.route("/search", methods=["GET"])
+@product_bp.doc(
+    summary="Пошук продуктів",
+    description="Пошук продуктів за назвою",
+    tags=["Products"]
+)
+@product_bp.arguments(SearchSchema, location="query")
+@product_bp.response(200, ProductResponseSchema(many=True))
+def search_product(args):
+    db = get_db()
+    products = db.scalars(
+        select(Product).where(Product.name.ilike(f"%{args['query']}%")).
+               limit(10)
+    ).all()
     return products
 
 

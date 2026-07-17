@@ -1,5 +1,6 @@
 from flask_smorest import Blueprint
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy import select
 
 from app.decorator import role_required
 from app.schemas.category_schema import(
@@ -9,6 +10,7 @@ from app.schemas.category_schema import(
 )
 from app.db.session import get_db
 from app.db.model import Category
+from app.schemas.search_schemas import SearchSchema
 
 category_bp = Blueprint(
     "categories",
@@ -69,6 +71,23 @@ def create_category(data):
 def get_categories():
     db = get_db()
     categories = db.query(Category).all()
+    return categories
+
+
+@category_bp.route("/search", methods=["GET"])
+@category_bp.doc(
+    summary="Пошук категорій",
+    description="Пошук категорій за назвою",
+    tags=["Categories"]
+)
+@category_bp.arguments(SearchSchema, location="query")
+@category_bp.response(200, CategoryResponseSchema(many=True))
+def search_category(args):
+    db = get_db()
+    categories = db.scalars(
+        select(Category).where(Category.name.ilike(f"%{args['query']}%"))
+            .limit(10)
+        ).all()
     return categories
 
 
