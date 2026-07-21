@@ -51,12 +51,14 @@ def create_app():
     from app.router.admin import worker_bp
     from app.router.category import category_bp
     from app.router.product import product_bp
+    from app.router.order import order_bp
 
     api.register_blueprint(home_bp)
     api.register_blueprint(user_bp)
     api.register_blueprint(worker_bp)
     api.register_blueprint(category_bp)
     api.register_blueprint(product_bp)
+    api.register_blueprint(order_bp)
     app.teardown_appcontext(close_db)
 
     return app

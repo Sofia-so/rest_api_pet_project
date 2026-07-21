@@ -7,7 +7,8 @@ from sqlalchemy.orm import (
 from sqlalchemy import (
     ForeignKey,
     Enum,
-    Numeric
+    Numeric,
+    String
 )
 from decimal import Decimal
 from datetime import datetime
@@ -94,6 +95,7 @@ class Order(Base):
     __tablename__ = "orders"
     id: Mapped[int] = mapped_column(primary_key=True)
     number: Mapped[str] = mapped_column(
+        String(30),
         unique=True,
         nullable=False
     )
@@ -103,11 +105,15 @@ class Order(Base):
             values_callable=lambda enum: [
                 item.value for item in enum
             ]),
+        default=OrderStatus.PENDING,
         nullable=False
     )
     customer_first_name: Mapped[str] = mapped_column(nullable=False)
     customer_last_name: Mapped[str] = mapped_column(nullable=False)
-    customer_phone: Mapped[str] = mapped_column(nullable=False)
+    customer_phone: Mapped[str] = mapped_column(
+        String(20),
+        nullable=False
+    )
     total_price: Mapped[Decimal] = mapped_column(
         Numeric(10,2),
         nullable=False

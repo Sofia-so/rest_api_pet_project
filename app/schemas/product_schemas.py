@@ -5,6 +5,7 @@ from marshmallow import (
 )
 
 from app.schemas.category_schema import CategoryResponseSchema
+from app.db.model_enum import ProductStatus
 
 
 class ProductBaseSchema(Schema):
@@ -13,7 +14,11 @@ class ProductBaseSchema(Schema):
         validate=validate.Length(max=60)
     )
     description = fields.Str(required=False)
-    status = fields.Str(required=True)
+    status = fields.Enum(
+        ProductStatus,
+        by_value=True,
+        required=True
+    )
     price = fields.Decimal(
         required=True,
         places=2,
