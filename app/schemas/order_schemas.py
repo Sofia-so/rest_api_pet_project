@@ -32,7 +32,7 @@ class OrderCreateSchema(Schema):
         DeliveryMethod,
         by_value=True,
         required=True
-)
+    )
     items = fields.List(
         fields.Nested(OrderItemSchema),
         required=True,
