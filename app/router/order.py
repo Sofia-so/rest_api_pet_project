@@ -215,17 +215,27 @@ def cancel_order(order_id):
 @order_bp.doc(
     summary="Список замовлень",
     description="""
-    Повертає список усіх замовлень.
+    Повертає список замовлень.
 
-    Доступно лише користувачам з ролями "admin" та "employee".
+    Адміністратор та працівник бачать усі замовлення.
+    Користувач бачить лише власні замовлення.
     """,
     tags=["Orders"]
 )
 @order_bp.response(200, OrderResponsesSchema(many=True))
-@role_required("admin", "employee")
+@role_required("admin", "employee", "user")
 def get_orders():
     db = get_db()
-    orders = db.query(Order).all()
+    user_id = get_jwt_identity()
+    current_user = db.get(User, user_id)
+
+    if current_user.role in ("admin", "employee"):
+        orders = db.query(Order).all()
+    else:
+        orders = db.query(Order).filter(
+            Order.user_id == current_user.id
+        ).all()
+
     return orders
 
 
