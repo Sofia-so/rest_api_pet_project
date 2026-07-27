@@ -30,6 +30,10 @@ The project provides a RESTful API for user authentication, product and category
 - Interactive Swagger/OpenAPI documentation
 - Database migrations with Alembic
 
+## Database Diagram
+
+![Database Diagram](images/erd.png)
+
 ## Requirements
 
 - Python 3.12+
