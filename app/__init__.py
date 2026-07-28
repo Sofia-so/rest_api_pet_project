@@ -8,27 +8,22 @@ from app.router import (
     root,
     home
 )
+from app.db.md_engine import init_engine
 import os
 from dotenv import load_dotenv
 
+load_dotenv()
 
 def create_app():
     app = Flask(__name__)
 
-    load_dotenv()
-
-    app.config.update(
-        API_TITLE="API",
-        API_VERSION="v1",
-        OPENAPI_VERSION="3.0.3",
-        OPENAPI_URL_PREFIX="/api",
-        OPENAPI_JSON_PATH="openapi.json",
-        OPENAPI_SWAGGER_UI_PATH="/swagger-ui",
-        OPENAPI_SWAGGER_UI_URL="https://cdn.jsdelivr.net/npm/swagger-ui-dist/",
-        PROPAGATE_EXCEPTIONS=True,
+    config_type = os.getenv(
+        "CONFIG_TYPE",
+        default="app.config.Config"
     )
-    app.config["SECRET_KEY"] = os.getenv("JWT_SECRET_KEY")
-    app.config["JWT_SECRET_KEY"] = os.getenv("JWT_SECRET_KEY", "dev-jwt-secret")
+    app.config.from_object(config_type)
+    init_engine(app.config["SQLALCHEMY_DATABASE_URI"])
+
     app.config["API_SPEC_OPTIONS"] = {
         "components": {
             "securitySchemes": {

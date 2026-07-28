@@ -59,6 +59,28 @@ def run_migrations_online() -> None:
     and associate a connection with the context.
 
     """
+    import os
+    from dotenv import load_dotenv
+
+    load_dotenv()
+
+    database_url = os.getenv("DATABASE_URI")
+
+    if os.getenv("CONFIG_TYPE") == "app.config.TestingConfig":
+        database_url = os.getenv("TEST_DATABASE_URI")
+
+    config.set_main_option("sqlalchemy.url", database_url)
+    print("CONFIG_TYPE:", os.getenv("CONFIG_TYPE"))
+    print("DATABASE_URL:", database_url)
+    print("DATABASE_URL:", database_url)
+
+    from sqlalchemy import create_engine, text
+
+    engine = create_engine(database_url)
+
+    with engine.connect() as conn:
+        print("CURRENT DATABASE:", conn.execute(text("select current_database()")).scalar())
+
     connectable = engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",
