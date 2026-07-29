@@ -8,7 +8,7 @@ from flask_jwt_extended import (
     jwt_required,
     get_jwt_identity
 )
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from flask_smorest import Blueprint
 from app.schemas.user_schemas import (
     UserResponseSchema,
@@ -71,7 +71,7 @@ def get_user():
 )
 @jwt_required()
 def update_user(data):
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     db = get_db()
     user = db.query(User).filter_by(
         id=user_id
@@ -114,7 +114,7 @@ def update_user(data):
 )
 @jwt_required()
 def delete_user():
-    user_id = get_jwt_identity()
+    user_id = int(get_jwt_identity())
     db = get_db()
     user = db.get(User, user_id)
 
@@ -124,9 +124,12 @@ def delete_user():
     try:
         db.delete(user)
         db.commit()
+    except IntegrityError:
+        db.rollback()
+        return {"message": "У користувача є замовлення"}, 409
     except Exception:
         db.rollback()
-        return {"message": "Не вдалося виконати запит."}, 500
+        raise
     return "", 204
 
 
@@ -174,8 +177,11 @@ def change_password(data):
     try:
         user.password = generate_password_hash(data["new_password"])
         db.commit()
-    except Exception:
+    except SQLAlchemyError:
         db.rollback()
         return {"message": "Не вдалося змінити пароль."}, 500
+    except Exception:
+        db.rollback()
+        raise
 
     return {"message": "Пароль успішно змінено."}

@@ -73,6 +73,14 @@ def init_database(app):
         password=generate_password_hash(password),
         role="client"
     )
+    test_user3 = User(
+        first_name="test_client",
+        last_name="test_client",
+        username="testclient3",
+        email="testclient3@email.com",
+        password=generate_password_hash(password),
+        role="client"
+    )
     test_employee = User(
         first_name="test_employee",
         last_name="test_employee",
@@ -86,12 +94,14 @@ def init_database(app):
         test_admin,
         test_user1,
         test_user2,
+        test_user3,
         test_employee
     ])
     db.commit()
     db.refresh(test_admin)
     db.refresh(test_user1)
     db.refresh(test_user2)
+    db.refresh(test_user3)
     db.refresh(test_employee)
 
     category1 = Category(

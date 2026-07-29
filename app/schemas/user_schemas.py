@@ -34,7 +34,9 @@ class UserBaseSchema(Schema):
     @validates_schema
     def validate_password_match(self, data, **kwargs):
         if data["password"] != data["confirm_password"]:
-            raise ValidationError("Паролі не співпадають")
+            raise ValidationError(
+                {"confirm_password": "Паролі не співпадають."}
+            )
 
 
 class UserUpdateSchema(Schema):
@@ -46,6 +48,8 @@ class UserUpdateSchema(Schema):
 
 class UserResponseSchema(Schema):
     id = fields.Int(dump_only=True)
+    first_name = fields.Str()
+    last_name = fields.Str()
     username = fields.Str()
     email = fields.Email()
 

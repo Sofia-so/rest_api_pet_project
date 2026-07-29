@@ -32,6 +32,36 @@ def test_login(
     assert data["username"] == "testclient1"
 
 
+def test_login_wrong_username(
+        test_client,
+        init_database
+):
+    login_response = test_client.post(
+        "/user/login",
+        json={
+            "username": "testcliiient1",
+            "password": "strong_password"
+        }
+    )
+
+    assert login_response.status_code == 401
+
+
+def test_login_wrong_password(
+        test_client,
+        init_database
+):
+    login_response = test_client.post(
+        "/user/login",
+        json={
+            "username": "testclient1",
+            "password": "strong_passwo55rd"
+        }
+    )
+
+    assert login_response.status_code == 401
+
+
 def test_get_current_user_without_token(test_client):
 
     response = test_client.get(
