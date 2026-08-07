@@ -67,11 +67,14 @@ def test_create_order_success(
     )
     assert product_response.status_code == 201
 
-    product = db.scalar(
+    product1 = db.scalar(
         select(Product).where(Product.name == "test_product42")
     )
+    product2 = db.scalar(
+        select(Product).where(Product.name == "test_product1")
+    )
 
-    assert product is not None
+    assert product1 is not None
 
     response = test_client.post(
         "/order/",
@@ -85,11 +88,11 @@ def test_create_order_success(
             "delivery_method": "pickup",
             "items": [
                 {
-                    "product_id": product.id,
+                    "product_id": product1.id,
                     "quantity": 6
                 },
                 {
-                    "product_id": product.id,
+                    "product_id": product2.id,
                     "quantity": 3
                 }
             ]
@@ -103,8 +106,8 @@ def test_create_order_success(
     order_items = db.scalars(
         select(OrderItem).where(OrderItem.order_id == order.id)
     ).all()
-    total_price = (6 * product.price) + (3 * Decimal("223.60"))
-    updated_product = db.get(Product, product.id)
+    total_price = (6 * product1.price) + (3 * product2.price)
+    updated_product = db.get(Product, product1.id)
     expected = sorted(
         (item.product_id, item.quantity, item.price)
         for item in order_items
