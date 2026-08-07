@@ -68,7 +68,7 @@ def test_create_order_success(
     assert product_response.status_code == 201
 
     product = db.scalar(
-        select(Product).where(Product.name == "test_product1")
+        select(Product).where(Product.name == "test_product42")
     )
 
     assert product is not None
@@ -161,7 +161,7 @@ def test_create_order_insufficient_quantity_of_product(
             "items": [
                 {
                     "product_id": product.id,
-                    "quantity": 43
+                    "quantity": product.quantity + 1
                 }
             ]
         }
