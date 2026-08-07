@@ -41,14 +41,14 @@ def app():
     os.environ.pop("CONFIG_TYPE", None)
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def test_client(app):
     with app.test_client() as testing_client:
         with app.app_context():
             yield testing_client
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def init_database(app):
     db = get_db()
 
