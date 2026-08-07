@@ -89,7 +89,7 @@ def test_create_order_success(
                     "quantity": 6
                 },
                 {
-                    "product_id": 1,
+                    "product_id": product.id,
                     "quantity": 3
                 }
             ]
@@ -131,6 +131,7 @@ def test_create_order_insufficient_quantity_of_product(
         test_client,
         init_database
 ):
+    db = init_database
     login_response = test_client.post(
         "/user/login",
         json={
@@ -142,6 +143,10 @@ def test_create_order_insufficient_quantity_of_product(
 
     login_json = login_response.get_json()
     token = login_json["access_token"]
+
+    product = db.scalar(
+        select(Product).where(Product.name == "test_product42")
+    )
 
     response = test_client.post(
         "/order/",
@@ -155,7 +160,7 @@ def test_create_order_insufficient_quantity_of_product(
             "delivery_method": "pickup",
             "items": [
                 {
-                    "product_id": 1,
+                    "product_id": product.id,
                     "quantity": 43
                 }
             ]

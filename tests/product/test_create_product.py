@@ -90,7 +90,7 @@ def test_create_product_duplicate_name(
             "Authorization": f"Bearer {token}"
         },
         json={
-            "name": "test_product_test",
+            "name": "test_product1",
             "description": "test product",
             "status": "available",
             "price": 5789,

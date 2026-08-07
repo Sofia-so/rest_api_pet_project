@@ -1,6 +1,6 @@
 from sqlalchemy import select
 
-from app.db.model import User
+from app.db.model import User, Product
 
 
 def test_delete_user_success(
@@ -64,6 +64,9 @@ def test_delete_user_with_order(
 
     login_data = login_response.get_json()
     token = login_data["access_token"]
+    product = db.scalar(
+        select(Product).where(Product.name == "test_product1")
+    )
     order_response = test_client.post(
         "/order/",
         headers={
@@ -76,7 +79,7 @@ def test_delete_user_with_order(
             "delivery_method": "courier",
             "items": [
                 {
-                    "product_id": 1,
+                    "product_id": product.id,
                     "quantity": 1
                 }
             ]
