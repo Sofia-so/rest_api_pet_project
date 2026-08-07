@@ -21,7 +21,7 @@ from app.db.model_enum import (
 )
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="session")
 def app():
     os.environ["CONFIG_TYPE"] = "app.config.TestingConfig"
     print("CONFIG_TYPE:", os.getenv("CONFIG_TYPE"))
