@@ -1,5 +1,5 @@
 from flask_smorest import Blueprint
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy import select
 
 from app.decorator import role_required
@@ -54,9 +54,12 @@ def create_category(data):
         db.rollback()
         return {"message": "Категорія з такою назвою вже існує."}, 409
 
-    except Exception:
+    except SQLAlchemyError:
         db.rollback()
         return {"message": "Виникла помилка сервера"}, 500
+    except Exception:
+        db.rollback()
+        raise
 
     return category, 201
 
@@ -136,9 +139,12 @@ def update_category(data, category_id):
         db.rollback()
         return {"message": "Категорія з такою назвою вже існує."}, 400
 
-    except Exception:
+    except SQLAlchemyError:
         db.rollback()
         return {"message": "Виникла помилка сервера"}, 500
+    except Exception:
+        db.rollback()
+        raise
 
     return category
 

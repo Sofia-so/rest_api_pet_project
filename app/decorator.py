@@ -17,7 +17,7 @@ def role_required(*roles):
             db = get_db()
 
             user = db.query(User).filter_by(
-                id=get_jwt_identity()
+                id=int(get_jwt_identity())
             ).first()
 
             if user is None:

@@ -1,4 +1,4 @@
-from flask_smorest import Blueprint
+from flask_smorest import Blueprint, abort
 from flask_jwt_extended import (
     jwt_required,
     get_jwt_identity
@@ -91,10 +91,11 @@ def create_order(data):
             )
 
         if product.quantity < item["quantity"]:
-            return {
-                "message": f"Недостатньо товару '{product.name}' на складі. "
-                           f"Доступна кількість товару {product.quantity}"
-            }, 400
+            return abort(
+                400,
+                message=f"Недостатньо товару '{product.name}' на складі. "
+                        f"Доступна кількість товару {product.quantity}"
+            )
 
         order_item = OrderItem(
             product_id=product.id,
@@ -223,7 +224,7 @@ def cancel_order(order_id):
     tags=["Orders"]
 )
 @order_bp.response(200, OrderResponsesSchema(many=True))
-@role_required("admin", "employee", "user")
+@role_required("admin", "employee", "client")
 def get_orders():
     db = get_db()
     user_id = get_jwt_identity()
@@ -303,17 +304,18 @@ def update_order_status(data, order_id):
     new_status = data["status"]
 
     if order.status == data["status"]:
-        return {
-            "message": "Замовлення вже має цей статус."
-        }, 400
+        abort(
+            400,
+            message="Замовлення вже має цей статус."
+        )
+        # return {
+        #     "message": "Замовлення вже має цей статус."
+        # }, 400
 
     if new_status not in allowed_transitions[order.status]:
-        return {
-            "message": (
-                f"Не можна змінити статус з "
+        abort(409, message=f"Не можна змінити статус з "
                 f"'{order.status.value}' на '{new_status.value}'."
             )
-        }, 409
 
     order.status = new_status
 

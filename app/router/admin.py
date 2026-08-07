@@ -1,6 +1,6 @@
 from flask_smorest import Blueprint
 from werkzeug.security import generate_password_hash
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 
 from app.schemas.user_schemas import (
     UserBaseSchema,
@@ -49,10 +49,15 @@ def register_employee(data):
 
     except IntegrityError:
         db.rollback()
-        return {"message": "Користувач з таким ім'ям або email вже існує."}, 400
+        return {"message": "Користувач з таким ім'ям або email вже існує."}, 409
 
-    except Exception:
+    except SQLAlchemyError:
+        db.rollback()
         return {"message": "Не вдалося виконати запит."}, 500
+    except Exception:
+        db.rollback()
+        raise
+
 
     return new_worker
 
@@ -100,8 +105,11 @@ def delete_employee(employee_id):
     try:
         db.delete(employee)
         db.commit()
-    except Exception:
+    except SQLAlchemyError:
         db.rollback()
         return {"message": "Не вдалося виконати запит."}, 500
+    except Exception:
+        db.rollback()
+        raise
 
     return "", 204

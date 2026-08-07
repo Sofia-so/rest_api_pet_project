@@ -1,5 +1,5 @@
 from flask_smorest import Blueprint
-from sqlalchemy.exc import IntegrityError
+from sqlalchemy.exc import IntegrityError, SQLAlchemyError
 from sqlalchemy import select
 
 from app.decorator import role_required
@@ -61,9 +61,12 @@ def create_product(data):
         db.rollback()
         return {"message": "Товар із такою назвою вже існує."}, 400
 
-    except Exception:
+    except SQLAlchemyError:
         db.rollback()
         return {"message": "Виникла помилка сервера."}, 500
+    except Exception:
+        db.rollback()
+        raise
 
     return product
 
@@ -182,6 +185,9 @@ def delete_product(product_id):
     try:
         db.delete(product)
         db.commit()
+    except IntegrityError as e:
+        db.rollback()
+        return {"message": f"{e}"}, 409
     except Exception:
         db.rollback()
         return {"message": "Виникла помилка"}, 500

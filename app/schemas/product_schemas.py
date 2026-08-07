@@ -34,6 +34,7 @@ class ProductResponseSchema(Schema):
     description = fields.Str()
     status = fields.Str()
     price = fields.Decimal()
+    quantity = fields.Int()
     category = fields.Nested(CategoryResponseSchema, only=("name",))
 
 

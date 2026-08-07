@@ -3,15 +3,21 @@ import os
 from alembic import command
 from alembic.config import Config
 from werkzeug.security import generate_password_hash
+from decimal import Decimal
+from sqlalchemy import select
 
 from app.db.session import get_db
 from app.db.model import(
     User,
     Category,
-    Product
+    Product,
+    Order,
+    OrderItem
 )
 from app.db.model_enum import (
-    ProductStatus
+    ProductStatus,
+    OrderStatus,
+    DeliveryMethod
 )
 
 
@@ -20,13 +26,13 @@ def app():
     os.environ["CONFIG_TYPE"] = "app.config.TestingConfig"
     print("CONFIG_TYPE:", os.getenv("CONFIG_TYPE"))
 
-    alembic_cfg = Config("alembic.ini")
-    command.upgrade(alembic_cfg, "head")
-
     from app import create_app
 
     app = create_app()
     print("DB:", app.config["SQLALCHEMY_DATABASE_URI"])
+
+    alembic_cfg = Config("alembic.ini")
+    command.upgrade(alembic_cfg, "head")
 
     with app.app_context():
         yield app
@@ -45,7 +51,6 @@ def test_client(app):
 @pytest.fixture(scope="module")
 def init_database(app):
     db = get_db()
-    print(db.query(User).all())
 
     password = "strong_password"
     test_admin = User(
@@ -141,6 +146,86 @@ def init_database(app):
     db.commit()
     db.refresh(product1)
     db.refresh(product2)
+
+    yield db
+    db.close()
+
+
+@pytest.fixture(scope="module")
+def init_db_orders(init_database):
+    db = init_database
+    user = db.scalar(
+        select(User).where(User.username == "testclient1")
+    )
+    product = Product(
+        name="test_product_test",
+        description="test product",
+        price=2323.60,
+        status=ProductStatus.AVAILABLE,
+        quantity=23,
+        category_id=1
+    )
+    order1 = Order(
+        number="ORD-001",
+        customer_first_name="Ivan",
+        customer_last_name="Ivanov",
+        customer_phone="+380000000000",
+        delivery_method=DeliveryMethod.PICKUP,
+        status=OrderStatus.PENDING,
+        total_price=Decimal("2323.60") * 2,
+        user_id=user.id
+    )
+    order1.items.extend([
+        OrderItem(
+            product=product,
+            quantity=2,
+            price=product.price
+        ),
+        OrderItem(
+            product=product,
+            quantity=2,
+            price=product.price
+        )
+    ])
+
+    order2 = Order(
+        number="ORD-002",
+        customer_first_name="Ivan",
+        customer_last_name="Ivanov",
+        customer_phone="+380000000000",
+        delivery_method=DeliveryMethod.PICKUP,
+        status=OrderStatus.SHIPPED,
+        total_price=Decimal("2323.60") * 3,
+        user_id=user.id
+    )
+    order2.items.extend([
+        OrderItem(
+            product=product,
+            quantity=3,
+            price=product.price
+        ),
+        OrderItem(
+            product=product,
+            quantity=3,
+            price=product.price
+        )
+    ])
+
+    db.add_all([order1, order2])
+    db.commit()
+
+    password = "password"
+    user = User(
+        first_name="test_client",
+        last_name="test_client",
+        username="testclient765",
+        email="testclient6t2@email.com",
+        password=generate_password_hash(password),
+        role="client"
+    )
+
+    db.add(user)
+    db.commit()
 
     yield db
     db.close()
