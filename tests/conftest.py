@@ -48,7 +48,7 @@ def test_client(app):
             yield testing_client
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def init_database(app):
     db = get_db()
 
@@ -158,7 +158,7 @@ def init_database(app):
     db.close()
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture(scope="function")
 def init_db_orders(init_database):
     db = init_database
     user = db.scalar(
