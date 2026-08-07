@@ -173,7 +173,7 @@ def init_db_orders(init_database):
         price=2323.60,
         status=ProductStatus.AVAILABLE,
         quantity=23,
-        category=category
+        category_id=category.id
     )
     order1 = Order(
         number="ORD-001",
@@ -238,4 +238,4 @@ def init_db_orders(init_database):
     db.commit()
 
     yield db
-    db.close()
+    db.rollback()
