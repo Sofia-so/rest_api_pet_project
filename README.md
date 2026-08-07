@@ -3,8 +3,6 @@
 A RESTful API for an online store built with Flask.
 The project provides a RESTful API for user authentication, product and category management, and order processing with role-based access control.
 
-**Project Status:** In Progress
-
 ## Technologies
 - Python
 - Flask
@@ -13,8 +11,10 @@ The project provides a RESTful API for user authentication, product and category
 - Alembic
 - Marshmallow
 - Flask-Smorest
-- Flask-JWT-Extended 
+- Flask-JWT-Extended
+- Pytest
 - Git
+- GitHub Actions
 
 ## Current Features
 
@@ -29,7 +29,11 @@ The project provides a RESTful API for user authentication, product and category
 - Request and response validation with Marshmallow
 - Interactive Swagger/OpenAPI documentation
 - Database migrations with Alembic
-
+- Comprehensive API testing using Pytest
+- Test coverage for authentication, user management, categories, products, and order workflows
+- Automated test database setup with Alembic migrations for the testing environment
+- CI pipeline with GitHub Actions for automated test execution
+  
 ## Database Diagram
 
 ![Database Diagram](images/erd.png)
@@ -91,6 +95,12 @@ flask db upgrade
 
 ```bash
 flask --app app:create_app --debug run
+```
+
+### 7. Running Tests
+
+```bash
+python -m pytest tests
 ```
 
 The API will be available at:
