@@ -164,13 +164,16 @@ def init_db_orders(init_database):
     user = db.scalar(
         select(User).where(User.username == "testclient1")
     )
+    category = db.scalar(
+        select(Category).where(Category.id == Category.name == "test_category1")
+    )    
     product = Product(
         name="test_product_test",
         description="test product",
         price=2323.60,
         status=ProductStatus.AVAILABLE,
         quantity=23,
-        category_id=1
+        category=category
     )
     order1 = Order(
         number="ORD-001",
