@@ -68,7 +68,7 @@ def test_create_order_success(
     assert product_response.status_code == 201
 
     product = db.scalar(
-        select(Product).where(Product.name == "test_product42")
+        select(Product).where(Product.name == "test_product1")
     )
 
     assert product is not None
@@ -145,7 +145,7 @@ def test_create_order_insufficient_quantity_of_product(
     token = login_json["access_token"]
 
     product = db.scalar(
-        select(Product).where(Product.name == "test_product42")
+        select(Product).where(Product.name == "test_product1")
     )
 
     response = test_client.post(
