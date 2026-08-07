@@ -52,6 +52,13 @@ def test_client(app):
 def init_database(app):
     db = get_db()
 
+    db.query(OrderItem).delete()
+    db.query(Order).delete()
+    db.query(Product).delete()
+    db.query(Category).delete()
+    db.query(User).delete()
+    db.commit()
+
     password = "strong_password"
     test_admin = User(
         first_name="test_admin",
