@@ -1,3 +1,5 @@
+from flask_smorest import abort
+
 from app.db.model import User
 from app.db.session import get_db
 from werkzeug.security import (
@@ -119,14 +121,20 @@ def delete_user():
     user = db.get(User, user_id)
 
     if not user:
-        return {"message": "Користувача не знайдено"}, 404
+        abort(
+            404,
+            message="Користувача не знайдено"
+        )
 
     try:
         db.delete(user)
         db.commit()
     except IntegrityError:
         db.rollback()
-        return {"message": "У користувача є замовлення"}, 409
+        abort(
+            409,
+            message="У користувача є замовлення"
+        )
     except Exception:
         db.rollback()
         raise

@@ -85,13 +85,13 @@ def create_order(data):
         )
 
         if product is None:
-            return (
-                {"message": f"Продукт з id={item['product_id']} не знайдено"},
-                404
+            abort(
+                404,
+                message=f"Продукт з id={item['product_id']} не знайдено"
             )
 
         if product.quantity < item["quantity"]:
-            return abort(
+            abort(
                 400,
                 message=f"Недостатньо товару '{product.name}' на складі. "
                         f"Доступна кількість товару {product.quantity}"
