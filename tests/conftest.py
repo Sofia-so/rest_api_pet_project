@@ -165,7 +165,7 @@ def init_db_orders(init_database):
         select(User).where(User.username == "testclient1")
     )
     category = db.scalar(
-        select(Category).where(Category.id == Category.name == "test_category1")
+        select(Category).where(Category.name == "test_category1")
     )    
     product = Product(
         name="test_product_test",
