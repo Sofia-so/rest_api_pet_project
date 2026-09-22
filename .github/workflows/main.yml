@@ -44,7 +44,7 @@ jobs:
       - name: Run tests
         env:
           CONFIG_TYPE: ${{ vars.CONFIG_TYPE }}
-          TEST_DATABASE_URI: ${{ secrets.TEST_DATABASE_URI }}
+          TEST_DATABASE_URI: postgresql+psycopg://postgres:${{ secrets.POSTGRES_CI_PASSWORD }}@localhost:5432/test_db_rest_api_proj
           JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
           TEST_SECRET_KEY: ${{ secrets.TEST_SECRET_KEY }}
         run: python -m pytest tests
