@@ -15,6 +15,8 @@ The project provides a RESTful API for user authentication, product and category
 - Pytest
 - Git
 - GitHub Actions
+- Docker/ Docker Hub
+- Render
 
 ## Current Features
 
@@ -33,6 +35,18 @@ The project provides a RESTful API for user authentication, product and category
 - Test coverage for authentication, user management, categories, products, and order workflows
 - Automated test database setup with Alembic migrations for the testing environment
 - CI pipeline with GitHub Actions for automated test execution
+- Containerized application with Docker
+- Deployment on Render
+
+## Deployment
+
+The application is deployed on Render.
+
+Live application:
+https://rest-api-pet-project.onrender.com 
+
+Swagger UI:
+https://rest-api-pet-project.onrender.com/api/swagger-ui
   
 ## Database Diagram
 
@@ -88,16 +102,26 @@ ADMIN_PASSWORD=your_admin_password
 ### 5. Run database migrations
 
 ```bash
-flask db upgrade
+python -m alembic upgrade head
 ```
 
-### 6. Start the application
+### 6. Create an administrator
+
+Create an administrator
+
+If an administrator needs to be created, run:
+
+python -m app.admin_create
+
+The database connection is determined by the DATABASE_URI environment variable.
+
+### 7. Start the application
 
 ```bash
 flask --app app:create_app --debug run
 ```
 
-### 7. Running Tests
+### Running Tests
 
 ```bash
 python -m pytest tests
@@ -108,8 +132,34 @@ The API will be available at:
 - API: http://127.0.0.1:5000
 - Swagger UI: http://127.0.0.1:5000/swagger-ui
 
----
+## CI
 
+GitHub Actions is used for continuous integration.
+
+The CI pipeline:
+
+- Sets up a Python environment
+- Starts a PostgreSQL test database
+- Installs project dependencies
+- Runs database migrations
+- Executes the Pytest test suite
+
+## Docker
+
+The application is containerized with Docker.
+
+### Build the Docker image
+
+```bash
+docker build -t flask-smorest-app .
+```
+
+### Run the container
+
+```
+docker run --env-file .env -e PORT=5000 -p 5000:5000 flask-smorest-app
+```
+---
 ## Author
 
 **Sofia Sudarkova**
