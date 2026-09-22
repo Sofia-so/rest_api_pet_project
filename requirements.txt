@@ -13,4 +13,6 @@ marshmallow==4.3.0
 
 email-validator==2.3.0
 
+gunicorn
+
 pytest==9.1.1
