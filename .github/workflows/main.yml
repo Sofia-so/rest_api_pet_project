@@ -16,7 +16,7 @@ jobs:
         image: postgres:16
         env:
           POSTGRES_USER: postgres
-          POSTGRES_PASSWORD: postgres_ci_password
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_CI_PASSWORD }}
           POSTGRES_DB: test_db_rest_api_proj
         ports:
           - 5432:5432
@@ -34,7 +34,7 @@ jobs:
         uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-          cache: 'pip'
+          cache: "pip"
 
       - name: Install dependencies
         run: |
@@ -43,8 +43,18 @@ jobs:
 
       - name: Run tests
         env:
-          CONFIG_TYPE: app.config.TestingConfig
-          TEST_DATABASE_URI: postgresql+psycopg://postgres:postgres_ci_password@localhost:5432/test_db_rest_api_proj
-          JWT_SECRET_KEY: test-jwt-secret-key
-          TEST_SECRET_KEY: test_secret_key
+          CONFIG_TYPE: ${{ vars.CONFIG_TYPE }}
+          TEST_DATABASE_URI: ${{ secrets.TEST_DATABASE_URI }}
+          JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+          TEST_SECRET_KEY: ${{ secrets.TEST_SECRET_KEY }}
         run: python -m pytest tests
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: false
+          tags: flask-smorest-app:ci
